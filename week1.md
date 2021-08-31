@@ -1,233 +1,243 @@
-Week 1: R Software Introduction
+Week 2: Reading Data in R
 ================
-written by Junvie Pailden
 
-The R Software
---------------
+To do any type of analysis, we need *data* to analyze.
 
-R is a programming environment for data analysis, graphics and statistical computing. The R language is widely used among statisticians for developing statistical software and data analysis.
+Typically, the data comes from some experiment, where we randomly sample
+from some population of interest and measure some set of features of interest
+for each unit of the sample.
 
-R processes commands entered by the user, who types the commands at the console, or submits the commands from a file called a script.
+In this lesson, the data has already been generated, and we consider various
+ways to read the data into R for further analysis.
 
-When the user use the console, each command or expression to be evaluated is typed at the command prompt, and immediately evaluated when the `Enter` key is pressed.
 
-When the user submits the commands from a file, each line of code is evaluated by hitting `Cntrl + R` or `Cntrl + Enter` for PC or hitting `Cmd + R` or `Cmd + Enter` for Mac.
+Matrices
+--------
 
-Helpful tips
-
--   Press the up-arrow key to recall commands and edit them.
--   Use the `Esc (Escape)` key to cancel a command.
--   Write comments after `#` sign.
-
-What is RStudio?
-----------------
-
-RStudio (<http://www.rstudio.org>) is R's popular front-end or integrated development environment (IDE). We will use RStudio for all class related computation and analysis. RStudio provides syntax highlighting, code completion and smart indentation. Some of RStudios features includes
-
--   plot history, zooming, and flexible image and PDF export;
--   integrated R help and documentation;
--   generating word or pdf file output;
--   searchable command history.
-
-Using R as a simple calculator
-------------------------------
-
-Start the RStudio system, the cursor is waiting for you to type in some R commands. For example, use R as a simple calculator:
+We often store numerical data in a rectangular format called matrices with two dimensions, rows and columns.
+Last week we created matrices by binding two vectors using the `cbind()` function.
+Another way is to use the `matrix()` function.
 
 ``` r
-7 + 4  # addition
-# [1] 11
-
-8 * 9 # multiplication
-# [1] 72
-
-17 / 3 # division
-# [1] 5.666667
-
-4 ^ 3 # power
-# [1] 64
-
-(1 + 0.03)^5 # association
-# [1] 1.159274
-
-exp(4) # exponential function
-# [1] 54.59815
-
-log(12) # natural log function
-# [1] 2.484907
-
-3.1415 * log(3)/(7 - atan(8))
-# [1] 0.6214557
+# store the vector (1, 2, 3, 4, 5, 6, 7, 8) into a 2x4 matrix named A
+A <- matrix(c(1,2,3,4,5,6,7,8), nrow = 2, ncol = 4) # nrow = # of rows, ncol = # of columns
+A
+#      [,1] [,2] [,3] [,4]
+# [1,]    1    3    5    7
+# [2,]    2    4    6    8
 ```
 
-Assignment Operator
--------------------
-
-Results of calculations can be stored in objects using the assignment operators:
-
--   an arrow (`<-`) formed by a smaller than character and a hyphen without a space;
--   the equal character (`=`).
-
-Many R users have suggested using `<-`, not `=`, for assignment.
+This populates the matrix by column.
+If we wanted to fill the matrix by row, we use `byrow = TRUE` argument.
 
 ``` r
-x <- sin(0)
-y <- 3.1415 * cos(pi)
-z <- x + y
-x
-# [1] 0
-y
-# [1] -3.1415
-z
-# [1] -3.1415
+B <- matrix(1:8, nrow = 2, ncol = 4, byrow = TRUE) # 1:8 is another way of generating  the vector
+B
+#      [,1] [,2] [,3] [,4]
+# [1,]    1    2    3    4
+# [2,]    5    6    7    8
 ```
 
-Storing Data in R
------------------
-
-*Example 1. (Temperature Data).* Average annual temperatures in New Haven, CT, were recorded in degrees Fahrenheit, as
-
-| Year             | 1968 | 1969 | 1970 | 1971 |
-|------------------|------|------|------|------|
-| Mean temperature | 51.9 | 51.8 | 51.9 | 53   |
-
-The combine function `c()` creates a vector from its arguments, and the result can be stored in user-defined vectors. We use the combine function to enter our data and store it in an object named `temps`.
+So that others may understand your results, make data self-describing.
+Comments is one way to do this.
+We can also assign column and row names using `colnames()` and `rownames()`, respectively.
 
 ``` r
-temps <- c(51.9, 51.8, 51.9, 53)
-temps
-# [1] 51.9 51.8 51.9 53.0
+colnames(A) <- c('C1', 'C2', 'C3', 'C4')
+rownames(A) <- c('R1', 'R2')
+A
+#    C1 C2 C3 C4
+# R1  1  3  5  7
+# R2  2  4  6  8
 ```
 
-Suppose that we want to convert the Fahrenheit temperatures (F) to Celsius temperatures (C). The formula for the conversion is *C* = 5/9(*F* − 32).
+Accessing the element of a matrix can be done using `[row, col]` notation.
 
 ``` r
-(5/9) * (temps - 32)
-# [1] 11.05556 11.00000 11.05556 11.66667
+A[1, 3]   # row 1, col 3 entry
+# [1] 5
+A[1, 1:3] # row 1, col 1 to 3
+# C1 C2 C3 
+#  1  3  5
+A[1, ]    # row 1
+# C1 C2 C3 C4 
+#  1  3  5  7
+A[ , 3]   # col 3
+# R1 R2 
+#  5  6
 ```
 
-Let's create another vector containing the year the temperatures were taken.
+Data Frames
+-----------
+
+Each element of a matrix in R must be of the same type, e.g., Boolean.
+However, in an experiment, we often measure two or more features that are of
+different types, e.g., for persons, we may simultaneously measure the categorical feature `male` or `female` and the numeric feature `height`.
+
+To accomodate such data, we use data frames. Data frames allow each column of
+data to be different, e.g., a `sex` column that consists of `male` or `female`
+and a height column that consists of numbers.
+
+Data frames are like Excel spreadsheets where each column represents a variable or measurement and each row represents an observational unit.
+We can create a data frame using the function `data.frame()`.
+
+We can check the structure of the data frame using the function `str()`. The output includes data information such as
+
+-   dimension (number of observations and variables),
+-   variable names
+-   data type
+    -   `logi`: logical, `TRUE` or `FALSE`
+    -   `int`: integer
+    -   `num`: numerical
+    -   `chr`: character
+    -   `Factor`: Factors are how R keeps track of categorical variables,
+                  like `male` or `female`.
 
 ``` r
-years <- c(1968, 1969, 1970, 1971)
-years
-# [1] 1968 1969 1970 1971
+stark.kids <- data.frame(
+  Name = c("Jon", "Sansa", "Arya", "Bran"),
+  Age = c(24, 20, 18, 17)
+)
+str(stark.kids)
+# 'data.frame': 4 obs. of  2 variables:
+#  $ Name: chr "Jon", "Sansa", "Arya", "Bran"
+#  $ Age : num  24 20 18 17
+stark.kids  
+#    Name Age
+# 1   Jon  24
+# 2 Sansa  20
+# 3  Arya  18
+# 4  Bran  17
 ```
 
-The preferred form for variable names is all lower case letters and words separated with dots `(variable.name)`.
-
-We can use the function `cbind` to combine the two vectors (`years` and `temps`) into a matrix.
+We can also use the names of variables in a data frame to access the variable using the notation `data$name`.
 
 ``` r
-temp.data <- cbind(years, temps)
-temp.data
-#      years temps
-# [1,]  1968  51.9
-# [2,]  1969  51.8
-# [3,]  1970  51.9
-# [4,]  1971  53.0
+stark.kids$Name
+# [1] Jon   Sansa Arya  Bran 
+# Levels: Arya Bran Jon Sansa
+mean(stark.kids$Age) # average age
+# [1] 19.75
 ```
 
-Objects in R
-------------
-
-Vectors and matrices are two of several types of objects in R. Other types of objects are lists, factors, and data frames. More on this later.
-
-A vector can be defined according to the data type it contains. There are
-
--   numeric vectors;
--   logical (or Boolean) vectors;
--   character (or string) vectors.
+Note that in the posted lesson, the `Name` column is shown as a factor with
+4 levels. This is typically not want you want, so R was changed to, by default,
+model a vector of strings as strings.
+To turn them into factors, you may use the `factor` command, e.g.:
 
 ``` r
-num <- c(3, 3.1, 3.14, pi, -pi, cos(pi))
-num
-# [1]  3.000000  3.100000  3.140000  3.141593 -3.141593 -1.000000
-char <- c("I", "Love", "Pie")
-char
-# [1] "I"    "Love" "Pie"
-char[2] # second entry of vector char
-# [1] "Love"
-char[-3] # displays the sub-vector excluding the 3 entry
-# [1] "I"    "Love"
+stark.kids$Name <- factor(stark.kids$Name)
+str(stark.kids)
 ```
 
-If a vector mixes different data types, R will store it as a character vector.
+
+Working with data frames included in R packages
+-----------------------------------------------
+
+There are a lot of pre-built data frames that come with R, such as the data
+`chickwts`. The data was the result of an experiment conducted to compare the effectiveness of various feed supplements on the growth rate of chickens.
 
 ``` r
-mixed <- c("I", "Love", 3)
-mixed
-# [1] "I"    "Love" "3"
+str(chickwts) # check data structure
+# 'data.frame': 71 obs. of  2 variables:
+#  $ weight: num  179 160 136 227 217 168 108 124 143 140 ...
+#  $ feed  : Factor w/ 6 levels "casein","horsebean",..: 2 2 2 2 2 2 2 2 2 2 ...
 ```
 
-Logical vectors are often defined as the result of control actions on numerical or character vectors.
+We can display selected rows using `head()` and `tail()` commands; or selected cell entries.
 
 ``` r
-num
-# [1]  3.000000  3.100000  3.140000  3.141593 -3.141593 -1.000000
-logic1 <- num > 2
-logic1
-# [1]  TRUE  TRUE  TRUE  TRUE FALSE FALSE
+head(chickwts, 4) # display first 4 rows
+#   weight      feed
+# 1    179 horsebean
+# 2    160 horsebean
+# 3    136 horsebean
+# 4    227 horsebean
+tail(chickwts, 2) # display last 2 rows
+#    weight   feed
+# 70    283 casein
+# 71    332 casein
 ```
 
-Vectors can be created using sequences using the operator `:` or using `seq()` function.
+Reading CSV data in R
+---------------------
+
+Often, you'll be getting data from a data file.
+A popular file format for data are comma separated files (.csv).
+Saving data files in .csv format is standard in practice.
+We use the command `read.csv` to read .csv data in R.
+
+    read.csv(file, header = TRUE)
+
+The arguments of the `read.csv` function includes (among others)
+
+-   `file`: name or URL (Universal Resource Locator) of the data set
+
+-   `header = TRUE`: if the file contains the names of the variables as its first line.
+
+### A) Loading a data set from a webpage using its URL.
+
+The article *Going Wireless (AARP Bulletin, June 2009)* reported the estimated percentage of households with only wireless phone service (no land line). In the accompanying data table, each state was also classified into one of three geographical regions—West (W), Middle states (M), and East (E).
+
+The URL of the data set `Going Wireless` that we need to read the data is (<https://goo.gl/72BKSf>).
 
 ``` r
-v.for <- 1:15 # generate integer sequence from 1 to 15
-v.for
-#  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
-v.back <- 15:1  # generate integer sequence from 15 to 1
-v.back
-#  [1] 15 14 13 12 11 10  9  8  7  6  5  4  3  2  1
-seq.by <- seq(from = 1, to = 15, by = 2) # generate a sequence from 1 to 15 incremented by 2
-seq.by
-# [1]  1  3  5  7  9 11 13 15
-seq.len <- seq(from = 1, to = 15, length.out = 8) # generate a sequence from 1 to 15 of length 8
-seq.len
-# [1]  1  3  5  7  9 11 13 15
-seq.len[1:5] # displays the first 5 entries
-# [1] 1 3 5 7 9
+wireless.data <- read.csv("https://goo.gl/72BKSf", header = TRUE)
+
+# we'd like to convert the Region column into factors
+wireless.data$Region <- factor(wireless.data$Region)
 ```
 
-Displaying Objects in R
------------------------
-
-You can display an object in two ways after storing it. The first is by typing the name of the object in a separate line and running the same line. Another is by enclosing the entire command/code in parentheses.
-
 ``` r
-seq.rev <- seq(from = 12, to = 0, by = -2) 
-seq.rev 
-# [1] 12 10  8  6  4  2  0
-(seq.rev <- seq(from = 12, to = 0, by = -2)) 
-# [1] 12 10  8  6  4  2  0
+str(wireless.data) # check structure
 ```
 
-The R Help System
------------------
+``` r
+head(wireless.data) # display first 6 rows by default
+#   Wireless Region State
+# 1     13.9      M    AL
+# 2     11.7      W    AK
+# 3     18.9      W    AZ
+# 4     22.6      M    AR
+# 5      9.0      W    CA
+# 6     16.7      W    CO
+```
 
-The help search functions are also available using the functions `help` and `help.search`, and the corresponding shortcuts `?` and `??`.
+### B) Loading a Data Set from the Working Directory.
 
--   `help("keyword")` or `?keyword` displays help for `“keyword”`.
--   `help.search("keyword")` or `??keyword` searches for all objects containing `“keyword”`.
+R is always pointed at a directory/folder on your machine where it looks for data sets and source files. To check your current working directory, you can run the command `getwd()` in the RStudio console.
 
-For example, when looking for information on computing the average or mean of a vector
+There are a number of ways to change the current working directory:
+
+-   Use the [setwd](https://stat.ethz.ch/R-manual/R-devel/library/base/html/getwd.html) R function
+
+-   Click `Session > Set Working Dir > Choose Directory` menu . This will also change directory location of the Files pane.
+
+-   From within the `Files` panel (lower right), click `More > Set As Working Directory` menu. (Navigation within the Files pane alone will not change the working directory.)
+
+> As good practice, save your `.Rmd` exercise file and your `.csv` data file in the same folder.
+
+### Data on flight delays on the tarmac
+
+Download `flight.delay.csv` from this [link](https://goo.gl/QjCxDz). To load the data `flight.delay.csv` from a folder in your machine, you need to change the working directory to that folder; otherwise, R will not know where to look for `flight.delay.csv`. Follow the instruction above on how to change the working directory. The `getwd()` function check whether you are in the correct working directory/folder.
 
 ``` r
-help("mean") # or
-# starting httpd help server ... done
-?mean        # scroll to the bottom to see examples
-x <- c(0:10, 50)
-x
-#  [1]  0  1  2  3  4  5  6  7  8  9 10 50
-mean(x)
-# [1] 8.75
+getwd() # no arguments needed
+# [1] "C:/Users/jpailde/Google Drive/SIUE_Class/rstatlab/rstatlab"
+delay <- read.csv("flight.delay.csv", header = TRUE)
+str(delay)
+# 'data.frame': 17 obs. of  3 variables:
+#  $ Airline             : Factor w/ 17 levels "AirTran","American",..: 8 6 7 5 3 17 10 2 12 11 ...
+#  $ Delays              : int  93 72 81 29 44 46 18 48 24 17 ...
+#  $ Rate.per.10K.Flights: num  4.9 4.1 2.8 2.7 1.6 1.6 1.4 1.3 1.2 1.1 ...
+head(delay)
+#          Airline Delays Rate.per.10K.Flights
+# 1     ExpressJet     93                  4.9
+# 2    Continental     72                  4.1
+# 3          Delta     81                  2.8
+# 4         Comair     29                  2.7
+# 5 American Eagle     44                  1.6
+# 6     US Airways     46                  1.6
 ```
 
 ------------------------------------------------------------------------
-
-Some Useful R Documentations
-----------------------------
-
-1.  [R Data Types](https://www.statmethods.net/input/datatypes.html)
-2.  [Google's R Style Guide](https://google.github.io/styleguide/Rguide.xml)
-3.  [R Markdown - Dynamic Documents for R](https://support.rstudio.com/hc/en-us/articles/205368677-R-Markdown-Dynamic-Documents-for-R)
