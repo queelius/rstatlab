@@ -1,11 +1,22 @@
 Week 2: Reading Data in R
 ================
-written by Junvie Pailden
+
+To do any type of analysis, we need *data* to analyze.
+
+Typically, the data comes from some experiment, where we randomly sample
+from some population of interest and measure some set of features of interest
+for each unit of the sample.
+
+In this lesson, the data has already been generated, and we consider various
+ways to read the data into R for further analysis.
+
 
 Matrices
 --------
 
-We often store numerical data in a rectangular format called matrices with two dimensions, rows and columns. Recall last week that we can create a matrix in R by binding two numerical vectors using the `cbind()` function. Another way is to use the `matrix()` function.
+We often store numerical data in a rectangular format called matrices with two dimensions, rows and columns.
+Last week we created matrices by binding two vectors using the `cbind()` function.
+Another way is to use the `matrix()` function.
 
 ``` r
 # store the vector (1, 2, 3, 4, 5, 6, 7, 8) into a 2x4 matrix named A
@@ -16,7 +27,8 @@ A
 # [2,]    2    4    6    8
 ```
 
-If we wanted to fill the matrix in order of the rows first, we use the optional `byrow = TRUE` argument.
+This populates the matrix by column.
+If we wanted to fill the matrix by row, we use `byrow = TRUE` argument.
 
 ``` r
 B <- matrix(1:8, nrow = 2, ncol = 4, byrow = TRUE) # 1:8 is another way of generating  the vector
@@ -26,7 +38,9 @@ B
 # [2,]    5    6    7    8
 ```
 
-We can assign column and row names using `colnames()` and `rownames()`, respectively.
+So that others may understand your results, make data self-describing.
+Comments is one way to do this.
+We can also assign column and row names using `colnames()` and `rownames()`, respectively.
 
 ``` r
 colnames(A) <- c('C1', 'C2', 'C3', 'C4')
@@ -56,7 +70,16 @@ A[ , 3]   # col 3
 Data Frames
 -----------
 
-Matrices can only store numerical values. We, however, often store values that are non-numeric. Data frames are generalized version of a matrix to include other types of data. Data frames are similar in concept to Excel spreadsheet where each column represents a variable or measurement and each row represents and observational unit. We can create a data frame using the function `data.frame()`.
+Each element of a matrix in R must be of the same type, e.g., Boolean.
+However, in an experiment, we often measure two or more features that are of
+different types, e.g., for persons, we may simultaneously measure the categorical feature `male` or `female` and the numeric feature `height`.
+
+To accomodate such data, we use data frames. Data frames allow each column of
+data to be different, e.g., a `sex` column that consists of `male` or `female`
+and a height column that consists of numbers.
+
+Data frames are like Excel spreadsheets where each column represents a variable or measurement and each row represents an observational unit.
+We can create a data frame using the function `data.frame()`.
 
 We can check the structure of the data frame using the function `str()`. The output includes data information such as
 
@@ -67,7 +90,8 @@ We can check the structure of the data frame using the function `str()`. The out
     -   `int`: integer
     -   `num`: numerical
     -   `chr`: character
-    -   `Factor`: Factors are how R keeps track of categorical variables.
+    -   `Factor`: Factors are how R keeps track of categorical variables,
+                  like `male` or `female`.
 
 ``` r
 stark.kids <- data.frame(
@@ -76,9 +100,9 @@ stark.kids <- data.frame(
 )
 str(stark.kids)
 # 'data.frame': 4 obs. of  2 variables:
-#  $ Name: Factor w/ 4 levels "Arya","Bran",..: 3 4 1 2
+#  $ Name: chr "Jon", "Sansa", "Arya", "Bran"
 #  $ Age : num  24 20 18 17
-stark.kids
+stark.kids  
 #    Name Age
 # 1   Jon  24
 # 2 Sansa  20
@@ -96,10 +120,22 @@ mean(stark.kids$Age) # average age
 # [1] 19.75
 ```
 
+Note that in the posted lesson, the `Name` column is shown as a factor with
+4 levels. This is typically not want you want, so R was changed to, by default,
+model a vector of strings as strings.
+To turn them into factors, you may use the `factor` command, e.g.:
+
+``` r
+stark.kids$Name <- factor(stark.kids$Name)
+str(stark.kids)
+```
+
+
 Working with data frames included in R packages
 -----------------------------------------------
 
-Consider the data `chickwts` in the package `datasets` included with every R installation. The data was the result of an experiment conducted to measure and compare the effectiveness of various feed supplements on the growth rate of chickens.
+There are a lot of pre-built data frames that come with R, such as the data
+`chickwts`. The data was the result of an experiment conducted to compare the effectiveness of various feed supplements on the growth rate of chickens.
 
 ``` r
 str(chickwts) # check data structure
@@ -126,7 +162,10 @@ tail(chickwts, 2) # display last 2 rows
 Reading CSV data in R
 ---------------------
 
-Data analysis using R often involves importing or reading data at some point. While R can read other data types, comma separated files (.csv) are much easier to work with. Saving data files in .csv format is standard in practice. We use the command `read.csv` to read .csv data in R.
+Often, you'll be getting data from a data file.
+A popular file format for data are comma separated files (.csv).
+Saving data files in .csv format is standard in practice.
+We use the command `read.csv` to read .csv data in R.
 
     read.csv(file, header = TRUE)
 
@@ -138,20 +177,19 @@ The arguments of the `read.csv` function includes (among others)
 
 ### A) Loading a data set from a webpage using its URL.
 
-The article *Going Wireless (AARP Bulletin, June 2009)* reported the estimated percentage of house- holds with only wireless phone service (no land line) for the 50 U.S. states and the District of Columbia. In the accompanying data table, each state was also classified into one of three geographical regions—West (W), Middle states (M), and East (E).
+The article *Going Wireless (AARP Bulletin, June 2009)* reported the estimated percentage of households with only wireless phone service (no land line). In the accompanying data table, each state was also classified into one of three geographical regions—West (W), Middle states (M), and East (E).
 
 The URL of the data set `Going Wireless` that we need to read the data is (<https://goo.gl/72BKSf>).
 
 ``` r
 wireless.data <- read.csv("https://goo.gl/72BKSf", header = TRUE)
+
+# we'd like to convert the Region column into factors
+wireless.data$Region <- factor(wireless.data$Region)
 ```
 
 ``` r
 str(wireless.data) # check structure
-# 'data.frame': 51 obs. of  3 variables:
-#  $ Wireless: num  13.9 11.7 18.9 22.6 9 16.7 5.6 5.7 20 16.8 ...
-#  $ Region  : Factor w/ 3 levels "E","M","W": 2 3 3 2 3 3 1 1 1 1 ...
-#  $ State   : Factor w/ 51 levels "AK","AL","AR",..: 2 1 4 3 5 7 6 9 8 10 ...
 ```
 
 ``` r
