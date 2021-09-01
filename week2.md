@@ -10,7 +10,6 @@ for each unit of the sample.
 In this lesson, the data has already been generated, and we consider various
 ways to read the data into R for further analysis.
 
-
 Matrices
 --------
 
@@ -72,7 +71,9 @@ Data Frames
 
 Each element of a matrix in R must be of the same type, e.g., Boolean.
 However, in an experiment, we often measure two or more features that are of
-different types, e.g., for persons, we may simultaneously measure the categorical feature `male` or `female` and the numeric feature `height`.
+different types, e.g., for persons, we may simultaneously measure the `sex` of the person, which is categorical variable whose outcome is either `male` or `female`,
+and the `height` of the person, which is a numerical variable whose outcome is
+any positive number.
 
 To accomodate such data, we use data frames. Data frames allow each column of
 data to be different, e.g., a `sex` column that consists of `male` or `female`
@@ -188,22 +189,19 @@ wireless.data <- read.csv("https://goo.gl/72BKSf", header = TRUE)
 wireless.data$Region <- factor(wireless.data$Region)
 ```
 
+We can examine the structure of the data frame `wireless.data` and
+the first 2 elements:
 ``` r
 str(wireless.data) # check structure
+# `data.frame':	51 obs. of  3 variables:
+# Wireless: num  13.9 11.7 18.9 22.6 9 16.7 5.6 5.7 20 16.8 ...
+# Region  : chr  "M" "W" "W" "M" ...
+# State   : chr  "AL" "AK" "AZ" "AR" ...
+> 
+head(wireless.data, n=2) # display first 2 rows using the named argument n
 ```
 
-``` r
-head(wireless.data) # display first 6 rows by default
-#   Wireless Region State
-# 1     13.9      M    AL
-# 2     11.7      W    AK
-# 3     18.9      W    AZ
-# 4     22.6      M    AR
-# 5      9.0      W    CA
-# 6     16.7      W    CO
-```
-
-### B) Loading a Data Set from the Working Directory.
+### B) Loading a data set from a local file in the working directory.
 
 R is always pointed at a directory/folder on your machine where it looks for data sets and source files. To check your current working directory, you can run the command `getwd()` in the RStudio console.
 
@@ -215,21 +213,19 @@ There are a number of ways to change the current working directory:
 
 -   From within the `Files` panel (lower right), click `More > Set As Working Directory` menu. (Navigation within the Files pane alone will not change the working directory.)
 
-> As good practice, save your `.Rmd` exercise file and your `.csv` data file in the same folder.
+> As good practice, save your `.Rmd` exercise file and your `.csv` data file in the same folder. Since you cannot control resources on the web, to avoid possible
+issues with a URL resource changing or becoming unavailable, I generally suggest
+making a local copy of the resource, which facilitates reproducibility. (A lot
+of current research is not reproducible; science by definition requires
+experiments to be reproducible by others.)
 
 ### Data on flight delays on the tarmac
 
-Download `flight.delay.csv` from this [link](https://goo.gl/QjCxDz). To load the data `flight.delay.csv` from a folder in your machine, you need to change the working directory to that folder; otherwise, R will not know where to look for `flight.delay.csv`. Follow the instruction above on how to change the working directory. The `getwd()` function check whether you are in the correct working directory/folder.
+Download `flight.delay.csv` from this [link](https://goo.gl/QjCxDz). To load the data in the local file `flight.delay.csv` from a folder in your machine, you need to change the working directory to that folder or use the file's fully qualified name.
 
 ``` r
 getwd() # no arguments needed
-# [1] "C:/Users/jpailde/Google Drive/SIUE_Class/rstatlab/rstatlab"
 delay <- read.csv("flight.delay.csv", header = TRUE)
-str(delay)
-# 'data.frame': 17 obs. of  3 variables:
-#  $ Airline             : Factor w/ 17 levels "AirTran","American",..: 8 6 7 5 3 17 10 2 12 11 ...
-#  $ Delays              : int  93 72 81 29 44 46 18 48 24 17 ...
-#  $ Rate.per.10K.Flights: num  4.9 4.1 2.8 2.7 1.6 1.6 1.4 1.3 1.2 1.1 ...
 head(delay)
 #          Airline Delays Rate.per.10K.Flights
 # 1     ExpressJet     93                  4.9
@@ -239,5 +235,23 @@ head(delay)
 # 5 American Eagle     44                  1.6
 # 6     US Airways     46                  1.6
 ```
+
+Note that since `flight.delay.csv` is at the web address (URL)
+`https://goo.gl/QjCxDz`, which is shortened URL for
+`https://raw.githubusercontent.com/jpailden/rstatlab/master/data/flight.delay.csv`,
+we may alternatively simply refer to URL in the argument to `read.csv`:
+
+``` r
+delay <- read.csv("https://goo.gl/QjCxDz", header = TRUE)
+```
+
+Or, using the unshortened URL:
+
+``` r
+delay <- read.csv(
+  "https://raw.githubusercontent.com/jpailden/rstatlab/master/data/flight.delay.csv", header = TRUE)
+```
+
+But, again, I generally advice downloading the file. 
 
 ------------------------------------------------------------------------
