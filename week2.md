@@ -3,9 +3,8 @@ Week 2: Reading Data in R
 
 To do any type of analysis, we need *data* to analyze.
 
-Typically, the data comes from some experiment, where we randomly sample
-from some population of interest and measure some set of features of interest
-for each unit of the sample.
+Typically, the data originally came from some kind of experiment, where we sample
+from some population of interest and measure some set of features for each unit of the sample.
 
 In this lesson, the data has already been generated, and we consider various
 ways to read the data into R for further analysis.
@@ -13,7 +12,6 @@ ways to read the data into R for further analysis.
 Matrices
 --------
 
-We often store numerical data in a rectangular format called matrices with two dimensions, rows and columns.
 Last week we created matrices by binding two vectors using the `cbind()` function.
 Another way is to use the `matrix()` function.
 
@@ -37,9 +35,9 @@ B
 # [2,]    5    6    7    8
 ```
 
-So that others may understand your results, make data self-describing.
-Comments is one way to do this.
-We can also assign column and row names using `colnames()` and `rownames()`, respectively.
+So that others may understand your results, data should be self-describing.
+One way to do this is assign column and row names to the matrix using
+`colnames()` and `rownames()`, respectively.
 
 ``` r
 colnames(A) <- c('C1', 'C2', 'C3', 'C4')
@@ -163,10 +161,11 @@ tail(chickwts, 2) # display last 2 rows
 Reading CSV data in R
 ---------------------
 
-Often, you'll be getting data from a data file.
-A popular file format for data are comma separated files (.csv).
-Saving data files in .csv format is standard in practice.
-We use the command `read.csv` to read .csv data in R.
+Often, the data set will exist as a file.
+A popular file format for data are comma separated values (CSV) which
+conventionally use the extension `.csv`, e.g., `sample.csv`.
+Saving data files in CSV format is standard in practice.
+We use the command `read.csv` to read CSV data in R.
 
     read.csv(file, header = TRUE)
 
@@ -189,16 +188,13 @@ wireless.data <- read.csv("https://goo.gl/72BKSf", header = TRUE)
 wireless.data$Region <- factor(wireless.data$Region)
 ```
 
-We can examine the structure of the data frame `wireless.data` and
-the first 2 elements:
+We can examine the structure of the data frame `wireless.data`:
 ``` r
 str(wireless.data) # check structure
 # `data.frame':	51 obs. of  3 variables:
 # Wireless: num  13.9 11.7 18.9 22.6 9 16.7 5.6 5.7 20 16.8 ...
 # Region  : chr  "M" "W" "W" "M" ...
 # State   : chr  "AL" "AK" "AZ" "AR" ...
-> 
-head(wireless.data, n=2) # display first 2 rows using the named argument n
 ```
 
 ### B) Loading a data set from a local file in the working directory.
@@ -213,7 +209,8 @@ There are a number of ways to change the current working directory:
 
 -   From within the `Files` panel (lower right), click `More > Set As Working Directory` menu. (Navigation within the Files pane alone will not change the working directory.)
 
-> As good practice, save your `.Rmd` exercise file and your `.csv` data file in the same folder. Since you cannot control resources on the web, to avoid possible
+> As good practice, save your `.Rmd` exercise file and your `.csv` data file in the same folder.
+Since you cannot control resources on the web, to avoid possible
 issues with a URL resource changing or becoming unavailable, I generally suggest
 making a local copy of the resource, which facilitates reproducibility. (A lot
 of current research is not reproducible; science by definition requires
